@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: /
-
-# Staging-safe default. Replace with `Allow: /` and add a sitemap only after launch review.
