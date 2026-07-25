@@ -34,10 +34,15 @@ export async function allowSignup(input: {
   networkHint?: string;
   timingSuspicious?: boolean;
 }): Promise<"allowed" | "rate_limited" | "unavailable"> {
-  // This process-local adapter is deliberately non-production. Production must
-  // provide a distributed platform limiter before lead capture can be enabled.
-  if (process.env.NODE_ENV === "production") return "unavailable";
-  const secret = process.env.SIGNUP_HASH_SECRET || developmentSecret();
+  // A stable production secret prevents raw email and network identifiers from
+  // being retained in the bounded, process-local buckets. Each Vercel instance
+  // enforces the same limits independently; a shared store can replace this
+  // adapter later without changing the route contract.
+  const configuredSecret = process.env.SIGNUP_HASH_SECRET;
+  if (process.env.NODE_ENV === "production" && !configuredSecret) {
+    return "unavailable";
+  }
+  const secret = configuredSecret || developmentSecret();
   const now = Date.now();
   // Keep this fallback bounded. A platform rate-limit binding can replace it without
   // changing the route contract.
