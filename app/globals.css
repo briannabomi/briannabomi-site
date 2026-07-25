@@ -1,0 +1,863 @@
+@import "tailwindcss";
+
+:root {
+  /* Palette allocation: ivory/cream 35%, espresso 25%, oxblood 10%, antique gold 5%.
+     The remaining visual field is breathing room, type, and functional state color. */
+  --ink: #2b1812;
+  --paper: #f2e7d5;
+  --paper-strong: #fff9ee;
+  --signal: #741b2e;
+  --signal-hover: #54101f;
+  --gold: #806034;
+  --gold-light: #d1b681;
+  --muted: #6f5b50;
+  --line: #d2bc94;
+  --success: #2d6a4f;
+  --error: #b42318;
+  --focus: #2457d6;
+  --step--1: clamp(0.875rem, 0.84rem + 0.15vw, 0.95rem);
+  --step-0: clamp(1rem, 0.95rem + 0.22vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.12rem + 0.55vw, 1.6rem);
+  --step-2: clamp(1.65rem, 1.35rem + 1.2vw, 2.5rem);
+  --step-3: clamp(2.2rem, 1.55rem + 2.7vw, 4.25rem);
+  --step-4: clamp(3rem, 1.75rem + 5vw, 7rem);
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-inter), "Instrument Sans", -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --section-space: clamp(4rem, 9vw, 8.5rem);
+  --shadow: 0 20px 60px rgb(43 24 18 / 12%);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
+  scroll-padding-top: 1.5rem;
+}
+
+body {
+  margin: 0;
+  background: var(--paper-strong);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+}
+
+main,
+section,
+footer {
+  min-width: 0;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.mechanism :focus-visible,
+.site-footer :focus-visible {
+  outline-color: var(--gold-light);
+}
+
+::selection {
+  background: var(--signal);
+  color: var(--paper-strong);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-block-start: 0;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+}
+
+h1 {
+  max-width: 12ch;
+  margin-block-end: 1.5rem;
+  font-size: var(--step-4);
+  line-height: 0.96;
+}
+
+h2 {
+  max-width: 15ch;
+  margin-block-end: 1.5rem;
+  font-size: var(--step-3);
+  line-height: 1.03;
+}
+
+h3 {
+  margin-block-end: 0.5rem;
+  font-size: var(--step-1);
+  line-height: 1.25;
+}
+
+p,
+li {
+  max-width: 65ch;
+  overflow-wrap: break-word;
+}
+
+.shell {
+  width: min(100% - 2 * clamp(1rem, 4vw, 4rem), 80rem);
+  margin-inline: auto;
+}
+
+.section {
+  padding-block: var(--section-space);
+  scroll-margin-top: 1.5rem;
+}
+
+#audit-signup,
+#final-audit-form,
+#audit-signup-title,
+#final-audit-form-email {
+  scroll-margin-top: clamp(1.5rem, 5vw, 4rem);
+}
+
+[tabindex="-1"]:focus-visible {
+  border-radius: 0.125rem;
+  outline: 3px solid var(--focus);
+  outline-offset: 0.35rem;
+}
+
+#audit-signup:target .audit-signup {
+  box-shadow: 0 0 0 3px var(--focus), var(--shadow);
+}
+
+.eyebrow {
+  margin-block-end: 1.25rem;
+  color: var(--signal);
+  font-size: var(--step--1);
+  font-weight: 750;
+  letter-spacing: 0.11em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  inset: 0 auto auto 1rem;
+  padding: 0.75rem 1rem;
+  transform: translateY(-150%);
+  background: var(--ink);
+  color: var(--paper-strong);
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  transform: translateY(1rem);
+}
+
+.site-header {
+  position: relative;
+  z-index: 10;
+  border-bottom: 1px solid rgb(210 188 148 / 76%);
+  background: var(--paper-strong);
+}
+
+.header-inner,
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.header-inner {
+  min-height: 5rem;
+}
+
+.wordmark {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.header-cta {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  border-bottom: 2px solid var(--signal);
+  font-size: var(--step--1);
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding-block-start: clamp(3rem, 7vw, 7rem);
+  background: var(--paper-strong);
+}
+
+.hero-grid {
+  display: grid;
+  gap: clamp(3rem, 7vw, 6rem);
+  align-items: center;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-deck {
+  max-width: 43rem;
+  margin-block-end: 1.25rem;
+  font-size: var(--step-1);
+  line-height: 1.42;
+}
+
+.hero-details {
+  margin-block-end: 2rem;
+  color: var(--muted);
+  font-size: var(--step--1);
+  font-weight: 650;
+}
+
+.hero-details span {
+  margin-inline: 0.35em;
+  color: var(--signal);
+}
+
+.hero-photo {
+  width: min(100%, 30rem);
+  justify-self: center;
+}
+
+.hero-photo-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  padding: clamp(0.35rem, 0.8vw, 0.55rem);
+  overflow: hidden;
+  border: 1px solid var(--gold);
+  border-radius: 50% 50% 0.75rem 0.75rem;
+  background: var(--paper);
+  box-shadow:
+    0 0 0 1px rgb(255 249 238 / 80%),
+    var(--shadow);
+}
+
+.hero-photo-frame img,
+.hero-portrait {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: calc(50% - 0.25rem) calc(50% - 0.25rem) 0.4rem 0.4rem;
+  object-fit: cover;
+  object-position: 47% 43%;
+}
+
+.scope-note {
+  max-width: 46rem;
+  margin-block: 1.5rem 0;
+  padding-inline-start: 1rem;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+  font-size: var(--step--1);
+  line-height: 1.55;
+}
+
+.recognition,
+.inside,
+.faq {
+  background: var(--paper);
+}
+
+.recognition-grid,
+.fit-grid,
+.faq-grid,
+.final-signup-grid {
+  display: grid;
+  gap: clamp(2.5rem, 6vw, 6rem);
+}
+
+.recognition-list,
+.fit-list,
+.areas-grid,
+.deliverables-grid,
+.process-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.recognition-list {
+  align-self: end;
+}
+
+.recognition-list li {
+  padding-block: 1.35rem;
+  border-top: 3px solid var(--signal);
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  line-height: 1.3;
+}
+
+.mechanism {
+  background: var(--ink);
+  color: var(--paper-strong);
+}
+
+.mechanism .eyebrow {
+  color: var(--gold-light);
+}
+
+.section-intro {
+  max-width: 48rem;
+  margin-block-end: clamp(2.75rem, 6vw, 5rem);
+}
+
+.section-intro > p:last-child {
+  font-size: var(--step-1);
+}
+
+.areas-grid,
+.deliverables-grid {
+  display: grid;
+  gap: 0 2.5rem;
+}
+
+.area-item {
+  padding-block: 1.75rem 2rem;
+  border-top: 1px solid rgb(209 182 129 / 42%);
+}
+
+.item-number,
+.deliverable-number,
+.process-list span {
+  display: block;
+  margin-block-end: 1.1rem;
+  color: var(--gold);
+  font-size: var(--step--1);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.area-item p,
+.mechanism-close {
+  color: #eadfcd;
+}
+
+.mechanism-close {
+  margin-block: 3rem 0;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  line-height: 1.25;
+}
+
+.deliverable {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: 1rem;
+  padding-block: 1.75rem 2rem;
+  border-top: 1px solid var(--line);
+}
+
+.deliverable-number {
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--signal);
+  border-radius: 50%;
+  color: var(--signal);
+  letter-spacing: 0;
+}
+
+.primary-cta,
+.audit-signup button[type="submit"],
+.audit-signup__button {
+  min-height: 54px;
+  padding: 0.8rem 1.35rem;
+  border: 2px solid var(--signal);
+  border-radius: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--signal);
+  color: #fff;
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.primary-cta:hover,
+.audit-signup button[type="submit"]:hover,
+.audit-signup__button:hover {
+  border-color: var(--signal-hover);
+  background: var(--signal-hover);
+  transform: translateY(-1px);
+}
+
+.inside-cta {
+  margin-block-start: 2rem;
+}
+
+.fit {
+  background: var(--paper-strong);
+}
+
+.fit-list li {
+  position: relative;
+  padding: 0.65rem 0 0.65rem 1.75rem;
+}
+
+.fit-list li::before {
+  position: absolute;
+  top: 1.12rem;
+  left: 0;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--signal);
+  content: "";
+}
+
+.fit-boundaries {
+  align-self: center;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border-top: 5px solid var(--signal);
+  background: var(--paper);
+}
+
+.fit-boundaries p:last-child {
+  margin-block-end: 0;
+  color: var(--muted);
+}
+
+.process {
+  background: var(--paper-strong);
+  border-block: 1px solid var(--line);
+}
+
+.process-list {
+  display: grid;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.process-list li {
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  background: var(--paper-strong);
+}
+
+.process-list span {
+  color: var(--signal);
+}
+
+.process-note {
+  margin-block: 2rem 0;
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+
+.faq-list details {
+  border-top: 1px solid var(--line);
+}
+
+.faq-list details:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.faq-list summary {
+  min-height: 60px;
+  padding: 1.15rem 2.75rem 1.15rem 0;
+  position: relative;
+  font-weight: 750;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faq-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-list summary::after {
+  position: absolute;
+  top: 50%;
+  right: 0.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: grid;
+  place-items: center;
+  transform: translateY(-50%);
+  color: var(--signal);
+  content: "+";
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.faq-list details[open] summary::after {
+  content: "−";
+}
+
+.faq-list details p {
+  padding: 0 2rem 1.35rem 0;
+  color: var(--muted);
+}
+
+.final-signup {
+  background: var(--ink);
+  color: var(--paper-strong);
+}
+
+.final-signup .eyebrow {
+  color: var(--gold-light);
+}
+
+.final-signup .scope-note {
+  color: #eadfcd;
+  border-color: var(--gold);
+}
+
+.scope-note-compact {
+  margin-block-start: 1.25rem;
+}
+
+.site-footer {
+  padding-block: 2rem;
+  border-top: 1px solid var(--gold);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.site-footer p {
+  margin: 0;
+  color: #eadfcd;
+  font-size: var(--step--1);
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem 1.5rem;
+}
+
+.footer-links a {
+  font-size: var(--step--1);
+  font-weight: 700;
+}
+
+/* Long-form policy content uses a reading scale rather than landing-page display scale. */
+.legal-content {
+  max-width: 48rem;
+}
+
+.legal-content h1 {
+  max-width: none;
+}
+
+.legal-content h2 {
+  max-width: 30ch;
+  margin-block: clamp(2.5rem, 6vw, 4rem) 1rem;
+  font-size: var(--step-2);
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+}
+
+.legal-content p {
+  max-width: 68ch;
+}
+
+.legal-updated {
+  margin-block-start: clamp(3rem, 7vw, 5rem);
+  padding-block-start: 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+
+/* Signup component: broad class support keeps both instances and every state aligned. */
+.audit-signup {
+  max-width: 42rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.audit-signup h2,
+.audit-signup h3,
+.audit-signup__heading {
+  max-width: none;
+  margin-block-end: 0.5rem;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+}
+
+.audit-signup__intro {
+  margin-block-end: 1.25rem;
+  color: var(--muted);
+}
+
+.audit-signup__field,
+.audit-signup__form {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.audit-signup__controls {
+  display: grid;
+  gap: 1rem;
+}
+
+.audit-signup__controls > * {
+  min-width: 0;
+}
+
+.audit-signup label,
+.audit-signup__label {
+  font-size: var(--step--1);
+  font-weight: 750;
+}
+
+.audit-signup input[type="text"],
+.audit-signup input[type="email"],
+.audit-signup__input {
+  width: 100%;
+  min-height: 54px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid #756a62;
+  border-radius: 0.25rem;
+  background: var(--paper-strong);
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.audit-signup input[type="text"]:hover,
+.audit-signup input[type="email"]:hover {
+  border-color: var(--ink);
+}
+
+.audit-signup input[aria-invalid="true"],
+.audit-signup__input--error {
+  border-width: 2px;
+  border-color: var(--error);
+}
+
+.audit-signup button[type="submit"],
+.audit-signup__button {
+  width: 100%;
+  margin-block-start: 0.35rem;
+}
+
+.audit-signup button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
+.audit-signup__honeypot {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.audit-signup__error,
+.audit-signup [role="alert"] {
+  margin: 0;
+  color: var(--error);
+  font-size: var(--step--1);
+  font-weight: 700;
+}
+
+.audit-signup__status:not(.audit-signup__error),
+.audit-signup [role="status"]:not(.audit-signup__error) {
+  padding: 1rem;
+  border-left: 4px solid var(--success);
+  background: #edf6f0;
+}
+
+.audit-signup__status strong {
+  display: block;
+  margin-block-end: 0.35rem;
+  color: #174c37;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  line-height: 1.25;
+}
+
+.audit-signup__status p:last-child {
+  margin-block-end: 0;
+}
+
+.audit-signup__form[aria-busy="true"] .audit-signup__status {
+  border-left-color: #756a62;
+  background: #eee9e2;
+  color: var(--ink);
+}
+
+@media (min-width: 40rem) {
+  .areas-grid,
+  .deliverables-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .process-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .audit-signup__controls button[type="submit"] {
+    margin-block-start: 0.25rem;
+  }
+}
+
+@media (min-width: 48rem) {
+  .recognition-grid,
+  .fit-grid,
+  .faq-grid,
+  .final-signup-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .hero-grid {
+    grid-template-columns: minmax(0, 7fr) minmax(18rem, 5fr);
+  }
+
+  .hero-photo {
+    justify-self: end;
+  }
+
+  .areas-grid .area-item:last-child {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 39.99rem) {
+  .header-inner {
+    min-height: 4.25rem;
+  }
+
+  .hero {
+    padding-block-start: 2.75rem;
+  }
+
+  .hero-photo {
+    width: min(88vw, 24rem);
+  }
+
+  .hero-details span {
+    display: none;
+  }
+
+  .hero-details {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .primary-cta {
+    width: 100%;
+  }
+
+  .footer-inner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .footer-links {
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 3px solid Highlight;
+  }
+
+  .primary-cta,
+  .audit-signup button[type="submit"],
+  .audit-signup__button,
+  .fit-boundaries,
+  .scope-note {
+    border: 2px solid ButtonText;
+  }
+
+  .fit-list li::before {
+    background: CanvasText;
+  }
+
+}
