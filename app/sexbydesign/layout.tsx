@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 
 const title = "Why You’re Not Having the Sex You Want | Sex by Design";
 const description =
@@ -62,6 +63,7 @@ export default function SexByDesignLayout({
           }).replace(/</g, "\\u003c"),
         }}
       />
+      <Script src="https://f.convertkit.com/ckjs/ck.5.js" strategy="afterInteractive" />
       {children}
     </>
   );
