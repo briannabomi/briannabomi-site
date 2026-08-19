@@ -870,6 +870,16 @@ function signupPayload(sc){
       campaign:'audit-v8',
       content:SLUG(PATTERNS[sc.primary].name)
         +(sc.secondary?'--'+SLUG(PATTERNS[sc.secondary].name):'')
+    },
+    /* The result, for Kit. Keys only — the server resolves the display names,
+       so nothing typed or tampered with here can reach the CRM as free text. */
+    audit:{
+      primary:sc.primary,
+      secondary:sc.secondary||undefined,
+      lean:S.lean||undefined,
+      wantsToBeLed:S.power.includes('Led')||S.power.includes('Switch'),
+      openToNonMonogamy:S.structure.some(x=>/Open|Poly|Swing/.test(x)),
+      kinkCurious:S.explore.some(x=>/Restraint|Intensity|Watched|Group/.test(x))
     }};
 }
 async function sendLead(sc){
