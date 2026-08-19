@@ -1,6 +1,14 @@
 import { subscribeToAudit } from "@/lib/server/kit";
 import { allowSignup } from "@/lib/server/signup-rate-limit";
-import { parseSignupInput } from "@/lib/server/signup-validation";
+import { parseSignupInput, type Funnel } from "@/lib/server/signup-validation";
+
+// Kit form per funnel. Form ids are not secrets — they appear in Kit's own
+// public embed snippets — so the audit's is inlined as a default and can still
+// be overridden per environment.
+const FORM_IDS: Record<Funnel, () => string | undefined> = {
+  sexbydesign: () => process.env.KIT_FORM_ID,
+  intimacyaudit: () => process.env.KIT_INTIMACY_FORM_ID || "9787915",
+};
 
 export const dynamic = "force-dynamic";
 const MAX_BODY_BYTES = 8 * 1024;
@@ -151,6 +159,7 @@ export async function POST(request: Request) {
     firstName: parsed.input.firstName,
     email: parsed.input.email,
     requestId,
+    formId: FORM_IDS[parsed.input.funnel ?? "sexbydesign"](),
   });
   if (result.status === "accepted") {
     return native

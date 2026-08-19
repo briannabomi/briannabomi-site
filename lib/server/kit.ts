@@ -53,7 +53,7 @@ async function requestKit(
 }
 
 export async function subscribeToAudit(
-  input: { firstName: string; email: string; requestId: string },
+  input: { firstName: string; email: string; requestId: string; formId?: string },
   transport: Transport = fetch,
 ): Promise<SubscribeResult> {
   const signupMode = mode();
@@ -65,7 +65,9 @@ export async function subscribeToAudit(
   }
 
   const apiKey = process.env.KIT_API_KEY;
-  const formId = process.env.KIT_FORM_ID;
+  // Each funnel has its own form. The caller resolves which one; falling back
+  // to KIT_FORM_ID would quietly file leads under the wrong list.
+  const formId = input.formId || process.env.KIT_FORM_ID;
   if (!apiKey || !formId) return { status: "unavailable" };
 
   const base = (process.env.KIT_API_BASE_URL || "https://api.kit.com/v4").replace(/\/+$/, "");
