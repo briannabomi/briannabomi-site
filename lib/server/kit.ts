@@ -52,8 +52,33 @@ async function requestKit(
   return lastResponse!;
 }
 
+/* Tag ids per archetype, e.g. KIT_ARCHETYPE_TAG_IDS={"C":"8412330","G":"8412331"}.
+   Optional: without it the archetype still lands as a custom field, which is
+   enough for Kit automations that branch on a field rather than a tag. */
+function archetypeTagId(key?: string): string | undefined {
+  if (!key) return undefined;
+  const raw = process.env.KIT_ARCHETYPE_TAG_IDS;
+  if (!raw) return undefined;
+  try {
+    const map = JSON.parse(raw) as Record<string, unknown>;
+    const id = map[key];
+    return typeof id === "string" || typeof id === "number" ? String(id) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function subscribeToAudit(
-  input: { firstName: string; email: string; requestId: string; formId?: string },
+  input: {
+    firstName: string;
+    email: string;
+    requestId: string;
+    formId?: string;
+    /* Kit custom fields, keyed by the field key set up in Kit. */
+    fields?: Record<string, string>;
+    /* Archetype key, used only to look up a tag id from the environment. */
+    archetypeKey?: string;
+  },
   transport: Transport = fetch,
 ): Promise<SubscribeResult> {
   const signupMode = mode();
@@ -83,7 +108,15 @@ export async function subscribeToAudit(
       {
         method: "POST",
         headers,
-        body: JSON.stringify({ email_address: input.email, first_name: input.firstName }),
+        body: JSON.stringify({
+          email_address: input.email,
+          first_name: input.firstName,
+          /* Kit ignores unknown keys and reports them as warnings, so a field
+             that has not been created in Kit yet degrades to a no-op rather
+             than failing the signup. Eight fields keeps this synchronous;
+             Kit switches to async processing above ten. */
+          ...(input.fields && Object.keys(input.fields).length ? { fields: input.fields } : {}),
+        }),
       },
       transport,
       deadline,
@@ -102,7 +135,25 @@ export async function subscribeToAudit(
       transport,
       deadline,
     );
-    return associationResponse.ok ? { status: "accepted" } : { status: "unavailable" };
+    if (!associationResponse.ok) return { status: "unavailable" };
+
+    /* Archetype tag, best effort. The lead is already captured and filed by
+       this point, so a tagging failure must not turn a good signup into an
+       error the reader sees. */
+    const tagId = archetypeTagId(input.archetypeKey);
+    if (tagId) {
+      try {
+        await requestKit(
+          `${base}/tags/${encodeURIComponent(tagId)}/subscribers`,
+          { method: "POST", headers, body: JSON.stringify({ email_address: input.email }) },
+          transport,
+          deadline,
+        );
+      } catch {
+        /* ignore — see above */
+      }
+    }
+    return { status: "accepted" };
   } catch (error) {
     if (
       (error instanceof DOMException && error.name === "AbortError") ||
