@@ -4,12 +4,16 @@ export type Attribution = Partial<
   Record<"source" | "medium" | "campaign" | "content", string>
 >;
 
+export const FUNNELS = ["sexbydesign", "intimacyaudit"] as const;
+export type Funnel = (typeof FUNNELS)[number];
+
 export type SignupInput = {
   firstName: string;
   email: string;
   website: string;
   startedAt?: number;
   attribution?: Attribution;
+  funnel?: Funnel;
 };
 
 const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -61,6 +65,16 @@ export function parseSignupInput(value: unknown):
     return { ok: false, reason: "invalid_request" };
   }
 
+  // Which funnel this signup came from. An allow-list, never a raw form id —
+  // the client must not be able to choose which Kit form it subscribes to.
+  let funnel: Funnel | undefined;
+  if (body.funnel !== undefined) {
+    if (typeof body.funnel !== "string" || !FUNNELS.includes(body.funnel as Funnel)) {
+      return { ok: false, reason: "invalid_request" };
+    }
+    funnel = body.funnel as Funnel;
+  }
+
   let attribution: Attribution | undefined;
   if (body.attribution !== undefined) {
     if (!body.attribution || typeof body.attribution !== "object" || Array.isArray(body.attribution)) {
@@ -81,6 +95,7 @@ export function parseSignupInput(value: unknown):
       website: typeof body.website === "string" ? body.website.trim() : "",
       startedAt: body.startedAt as number | undefined,
       attribution,
+      funnel,
     },
   };
 }
