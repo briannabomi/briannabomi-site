@@ -65,6 +65,19 @@ header .sub{max-width:34em;margin:20px auto 0;color:var(--dim);font-size:17px;
 .mark{width:44px;height:44px;margin:0 auto 20px;border:1px solid var(--line);border-radius:50%;
   display:grid;place-items:center;font-family:var(--disp);font-style:italic;font-size:19px;color:var(--rose)}
 .brand{font-size:10px;letter-spacing:.36em;text-transform:uppercase;color:var(--faint);margin-bottom:22px}
+.bmark{width:78px;margin:0 auto 18px}
+header.compact .bmark{width:60px;margin-bottom:14px}
+.bmark svg{display:block;width:100%;height:auto;
+  filter:drop-shadow(0 0 11px rgba(208,140,134,.30))}
+.warn{border-color:var(--rose-d);
+  background:linear-gradient(180deg,rgba(208,140,134,.08),rgba(208,140,134,.018));
+  box-shadow:0 0 48px -22px var(--glow)}
+.warn .eyebrow{color:var(--rose);display:block;margin-bottom:14px}
+.warn h2{margin-bottom:16px}
+.warn p{color:var(--cream);font-size:16.5px;line-height:1.72;margin-bottom:15px}
+.warn p:last-of-type{margin-bottom:22px}
+.warn b{color:var(--rose);font-weight:600}
+@media print{.warn{display:none}}
 .card{background:var(--room);border:1px solid var(--line);border-radius:6px;
   padding:clamp(26px,5.2vw,42px);margin-bottom:20px}
 footer{text-align:center;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--faint);
@@ -362,6 +375,21 @@ const ITEMS=[
 ];
 
 let uidN=0;
+/* The brand mark: the same two-circle idea as the progress meter, drawn
+   for standing still — wider apart so both circles read at logo size. */
+function brandMark(){
+  const u='bm'+(uidN++);
+  return `<svg viewBox="0 0 152 92" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs><clipPath id="${u}a"><circle cx="56" cy="46" r="34"/></clipPath></defs>
+    <circle cx="56" cy="46" r="34" stroke="rgba(240,231,224,.42)" stroke-width="1.6"/>
+    <circle cx="96" cy="46" r="34" stroke="rgba(240,231,224,.42)" stroke-width="1.6"/>
+    <g clip-path="url(#${u}a)">
+      <circle cx="96" cy="46" r="34" fill="#D49590" fill-opacity=".9"/>
+      <circle cx="96" cy="46" r="34" stroke="#D49590" stroke-width="1.6"/>
+    </g>
+  </svg>`;
+}
+
 function mark(p,cls=''){
   const u='m'+(uidN++), y=64-Math.min(Math.max(p,0),1)*52;
   return `<svg class="${cls}" viewBox="0 0 130 92" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -632,13 +660,13 @@ function header(){
   const hd=document.getElementById('hd');
   hd.classList.toggle('compact',S.step!==0);
   hd.innerHTML=S.step===0
-    ? `<div class="mark">sd</div>
+    ? `<div class="bmark">${brandMark()}</div>
        <div class="brand">Sex by Design &middot; The Intimacy Audit</div>
        <h1>Why You're Not Having the <em>Sex</em> You Want</h1>
        <p class="sub">Get clear on what's blocking sex and connection so you can decide whether to
          repair your current relationship or create a new one.</p>
        <div><span class="age">For adults 18+</span></div>`
-    : `<div class="mark">sd</div>
+    : `<div class="bmark">${brandMark()}</div>
        <div class="brand">Sex by Design</div>
        <h1>The <em>Intimacy</em> Audit</h1>`;
 }
@@ -977,6 +1005,16 @@ function buildWorkbook(){
    Turns an ordinary share link into a working embed. Pasting a watch/share
    URL straight into an iframe is the usual reason a video shows up blank,
    so the conversion happens here rather than in your head. */
+/* The read lives in memory only. Warn on exit until they have saved it. */
+let reportSaved=false;
+function guardExit(e){ if(!reportSaved){ e.preventDefault(); e.returnValue=''; return ''; } }
+function armExitGuard(){ window.addEventListener('beforeunload',guardExit); }
+function saveReport(){
+  reportSaved=true;
+  window.removeEventListener('beforeunload',guardExit);
+  window.print();
+}
+
 function videoEmbed(raw){
   const url=String(raw||'').trim();
   /* A Short is vertical; so is anything you flag with #portrait. */
@@ -1017,13 +1055,25 @@ function results(){
   buildWorkbook();
   const TR=traits(sc.t);
   const vid=videoEmbed(CFG.videoUrl);
+  armExitGuard();
   app.innerHTML=`
   <div class="card fade">
     <div class="eyebrow" style="margin-bottom:14px">Start here</div>
     <h2 style="margin-bottom:22px">${esc(S.name)}, watch this first.</h2>
     <div class="vidwrap${vid.portrait?' portrait':''}">${vid.html}</div>
-    <p class="lede">Two minutes on what your result actually means and what to do with it.
+    <p class="lede">One minute on what your results actually mean and what to do with them.
       Your full read is below.</p></div>
+
+  <div class="card warn fade">
+    <div class="eyebrow">Before you scroll</div>
+    <h2>Download your report first.</h2>
+    <p>This page exists only while this tab stays open. <b>Refresh it, close it, or hit back and
+      your results are gone</b> — the archetype, the traits, the sentence, all of it. Nothing is
+      saved to an account and no link will bring it back. You would have to start the audit over
+      from the first question.</p>
+    <p>The download takes ten seconds and gives you the whole read plus your workbook. Do it now,
+      then come back and read.</p>
+    <button class="btn brass" onclick="saveReport()">${DL}Download your report now</button></div>
 
   <div class="hgrid">
     <div class="acard pop">
@@ -1032,7 +1082,7 @@ function results(){
         ${CHAR[sc.primary]}</div>
       <div class="bot"><p>${esc(P.line)}</p>
         ${sc.secondary?`<div class="tiny" style="margin-top:18px">With <b style="color:var(--dim)">${PATTERNS[sc.secondary].name}</b> underneath</div>`:''}
-        <button class="btn brass" onclick="window.print()">${DL}Download your PDF</button></div>
+        <button class="btn brass" onclick="saveReport()">${DL}Download your PDF</button></div>
     </div>
     <div class="tcard pop" style="animation-delay:.15s">
       <h2 style="margin-bottom:6px;font-size:28px">Your traits</h2>
@@ -1081,12 +1131,13 @@ function results(){
     <div class="hl"><div class="sh">The sentence, undiluted</div>
       <p class="letter" style="font-size:20px;margin-top:4px">${esc(ai.sentence)}</p></div></div>
 
-  <div class="card fade">
-    <div class="eyebrow" style="margin-bottom:14px">Take it with you</div>
-    <h2 style="margin-bottom:16px">Your full workbook.</h2>
-    <p class="lede">Your archetype, your practice, your sentence, and four questions to journal on — the ones
+  <div class="card warn fade">
+    <div class="eyebrow">Take it with you</div>
+    <h2>Your full workbook.</h2>
+    <p>Your archetype, your practice, your sentence, and four questions to journal on — the ones
       that turn this read into a decision.</p>
-    <button class="btn brass" onclick="window.print()">${DL}Download your PDF</button></div>
+    <p>Last reminder: <b>close or refresh this page and none of it can be recovered.</b></p>
+    <button class="btn brass" onclick="saveReport()">${DL}Download your PDF</button></div>
 
   <div class="card fade">
     <div class="eyebrow" style="margin-bottom:14px">What this didn't cover</div>
