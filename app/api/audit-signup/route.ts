@@ -1,6 +1,28 @@
 import { subscribeToAudit } from "@/lib/server/kit";
 import { allowSignup } from "@/lib/server/signup-rate-limit";
-import { parseSignupInput, type Funnel } from "@/lib/server/signup-validation";
+import {
+  ARCHETYPES,
+  parseSignupInput,
+  type AuditProfile,
+  type Funnel,
+} from "@/lib/server/signup-validation";
+
+/* Kit custom fields. Create these keys in Kit under Subscribers → Custom
+   Fields; any that do not exist yet are ignored by Kit rather than erroring,
+   so this can ship before the Kit side is finished. */
+function auditFields(audit: AuditProfile | undefined): Record<string, string> | undefined {
+  if (!audit) return undefined;
+  return {
+    archetype: ARCHETYPES[audit.primary].name,
+    archetype_tag: ARCHETYPES[audit.primary].tag,
+    secondary_archetype: audit.secondary ? ARCHETYPES[audit.secondary].name : "",
+    lean: audit.lean ?? "",
+    wants_to_be_led: audit.wantsToBeLed ? "yes" : "no",
+    open_to_non_monogamy: audit.openToNonMonogamy ? "yes" : "no",
+    kink_curious: audit.kinkCurious ? "yes" : "no",
+    audit_completed_at: new Date().toISOString().slice(0, 10),
+  };
+}
 
 // Kit form per funnel. Form ids are not secrets — they appear in Kit's own
 // public embed snippets — so the audit's is inlined as a default and can still
@@ -160,6 +182,8 @@ export async function POST(request: Request) {
     email: parsed.input.email,
     requestId,
     formId: FORM_IDS[parsed.input.funnel ?? "sexbydesign"](),
+    fields: auditFields(parsed.input.audit),
+    archetypeKey: parsed.input.audit?.primary,
   });
   if (result.status === "accepted") {
     return native
